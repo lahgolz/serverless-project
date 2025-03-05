@@ -28,6 +28,8 @@ provider:
             - Fn::GetAtt: [MemesTable, Arn]
   environment:
     MEMES_TABLE: ${param:tableName}
+    AWS_ACCESS_KEY_ID: fake
+    AWS_SECRET_ACCESS_KEY: fake
     MINIO_ENDPOINT: localhost
     MINIO_PORT: 9000
     MINIO_ACCESS_KEY: minioadmin
