@@ -34,6 +34,11 @@ functions:
     handler: handler.handler
     events:
       - httpApi: "*"
+  s3hook:
+    handler: handler.s3hook
+    events:
+      - s3: local-bucket
+        event: s3:*
 
 resources:
   Resources:
@@ -43,7 +48,11 @@ resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
-          - AttributeName: title
+          - AttributeName: title             
+            AttributeType: S
+          - AttributeName: topText
+            AttributeType: S
+          - AttributeName: bottomText
             AttributeType: S
           - AttributeName: imageUrl
             AttributeType: S
@@ -56,6 +65,7 @@ resources:
 plugins:
   - serverless-offline
   - serverless-dynamodb
+  - serverless-s3-local
 
 custom:
   serverless-dynamodb:
@@ -68,3 +78,6 @@ custom:
       migrate: true
       seed: true
       convertEmptyValues: true
+  s3:
+    host: localhost
+    directory: /tmp

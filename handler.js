@@ -1,4 +1,5 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { S3 } = require("@aws-sdk/client-s3");
 
 const {
   DynamoDBDocumentClient,
@@ -24,3 +25,9 @@ app.use((req, res, next) => {
 });
 
 exports.handler = serverless(app);
+
+exports.s3hook = (event, context) => {
+  console.log(JSON.stringify(event));
+  console.log(JSON.stringify(context));
+  console.log(JSON.stringify(process.env));
+};
