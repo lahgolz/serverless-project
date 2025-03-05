@@ -45,15 +45,11 @@ resources:
             AttributeType: S
           - AttributeName: title
             AttributeType: S
-          - AttributeName: topText
-            AttributeType: S
-          - AttributeName: bottomText
-            AttributeType: S
-          - AttributeName: imageUrl
-            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
+          - AttributeName: title
+            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         TableName: ${param:tableName}
     MemesBucket:
