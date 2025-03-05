@@ -6,11 +6,13 @@ service: serverless-project
 stages:
   default:
     params:
-      tableName: "users-table-${sls:stage}"
+      tableName: "memes-table-${sls:stage}"
 
 provider:
   name: aws
   runtime: nodejs20.x
+  stage: dev
+  region: eu-west-3
   iam:
     role:
       statements:
@@ -23,9 +25,9 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource:
-            - Fn::GetAtt: [UsersTable, Arn]
+            - Fn::GetAtt: [MemesTable, Arn]
   environment:
-    USERS_TABLE: ${param:tableName}
+    MEMES_TABLE: ${param:tableName}
 
 functions:
   api:
@@ -35,14 +37,34 @@ functions:
 
 resources:
   Resources:
-    UsersTable:
+    MemesTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
-          - AttributeName: userId
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: title
+            AttributeType: S
+          - AttributeName: imageUrl
             AttributeType: S
         KeySchema:
-          - AttributeName: userId
+          - AttributeName: id
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${param:tableName}
+
+plugins:
+  - serverless-offline
+  - serverless-dynamodb
+
+custom:
+  serverless-dynamodb:
+    stages:
+      - dev
+    start:
+      docker: true
+      port: 8000
+      inMemory: true
+      migrate: true
+      seed: true
+      convertEmptyValues: true
