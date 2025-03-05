@@ -34,11 +34,6 @@ functions:
     handler: handler.handler
     events:
       - httpApi: "*"
-  s3hook:
-    handler: handler.s3hook
-    events:
-      - s3: memes-bucket
-        event: s3:*
 
 resources:
   Resources:
@@ -48,7 +43,7 @@ resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
-          - AttributeName: title             
+          - AttributeName: title
             AttributeType: S
           - AttributeName: topText
             AttributeType: S
