@@ -1,0 +1,28 @@
+meta {
+  name: Upload file
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{URL}}/upload
+  body: multipartForm
+  auth: none
+}
+
+script:pre-request {
+  const fs = require('fs');
+  const path = require('path');
+  const FormData = require("form-data");
+  
+  const attachmentFilename = "wallpaper.png";
+  const attachmentPath = path.join(bru.cwd(), attachmentFilename);
+  const attachment = fs.readFileSync(attachmentPath, "base64");
+  
+  const formData = new FormData();
+  formData.append('file', attachment, { filename: attachmentFilename }); 
+  req.setHeader("Content-Type", "application/octet-stream");
+  req.setHeader("Content-Encoding", "gzip");
+  
+  req.setBody(formData);
+}

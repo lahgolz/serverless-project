@@ -88,3 +88,58 @@ This will start a local emulator of AWS Lambda and tunnel your requests to and f
 Now you can invoke the function as before, but this time the function will be executed locally. Now you can develop your function locally, invoke it, and see the results immediately without having to re-deploy.
 
 When you are done developing, don't forget to run `serverless deploy` to deploy the function to the cloud.
+
+# Serverless Project with MinIO
+
+This project implements a serverless application using AWS Lambda, DynamoDB, and MinIO for object storage.
+
+## Prerequisites
+
+- Node.js (v16+)
+- Docker and Docker Compose
+- MinIO (can be run with Docker)
+
+## Setup
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Start MinIO using Docker:
+```bash
+docker run -p 9000:9000 -p 9001:9001 \
+  -e "MINIO_ROOT_USER=minioadmin" \
+  -e "MINIO_ROOT_PASSWORD=minioadmin" \
+  minio/minio server /data --console-address ":9001"
+```
+
+3. Initialize the MinIO bucket:
+```bash
+node minio-setup.js
+```
+
+4. Start the serverless offline server:
+```bash
+serverless offline start
+```
+
+## Environment Variables
+
+You can customize these environment variables:
+
+- `MINIO_ENDPOINT`: MinIO endpoint URL (default: http://localhost:9000)
+- `MINIO_ACCESS_KEY`: MinIO access key (default: minioadmin)
+- `MINIO_SECRET_KEY`: MinIO secret key (default: minioadmin)
+- `MINIO_BUCKET`: MinIO bucket name (default: memes-bucket)
+
+## API Endpoints
+
+- `POST /upload`: Upload a new image file
+- `POST /generate`: Generate a meme
+- `GET /memes`: List all memes
+- `GET /meme/:id`: Get details for a specific meme
+
+## Notes
+
+When deploying to production, make sure to set appropriate MinIO credentials and endpoint.

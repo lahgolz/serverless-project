@@ -1,0 +1,15 @@
+{
+  "version": "1",
+  "name": "serverless-project",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "scripts": {
+    "moduleWhitelist": ["form-data"],
+    "filesystemAccess": {
+      "allow": true
+    }
+  }
+}
