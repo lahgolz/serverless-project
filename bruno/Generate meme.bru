@@ -1,0 +1,19 @@
+meta {
+  name: Generate meme
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{URL}}/generate
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "imageUrl": "{{imageUrl}}",
+    "topText": "This is where I'd put\nmy working serverless\nproject",
+    "bottomText": "If I had one"
+  }
+}

@@ -1,7 +1,7 @@
 meta {
   name: Upload file
   type: http
-  seq: 2
+  seq: 1
 }
 
 post {
@@ -29,5 +29,5 @@ script:pre-request {
 
 script:post-response {
   const data = res.body;
-  bru.setEnvVar("fileUrl", data.url);
+  bru.setEnvVar("imageUrl", data.url);
 }

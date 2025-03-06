@@ -29,6 +29,9 @@ provider:
   environment:
     MEMES_TABLE: ${param:tableName}
     MEMES_BUCKET: memes-bucket
+    AWS_ACCESS_KEY_ID: S3RVER
+    AWS_SECRET_ACCESS_KEY: S3RVER
+    AWS_REGION: eu-west-3
 
 functions:
   api:
