@@ -21,6 +21,9 @@ body:json {
 
 script:post-response {
   const data = res.body;
-  const memeId = data.url.split("/").pop();
-  bru.setEnvVar("memeId", memeId);
+  
+  if (data.success) {
+    const memeId = data.url.split("/").pop();
+    bru.setEnvVar("memeId", memeId);
+  }
 }
