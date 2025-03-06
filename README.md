@@ -11,17 +11,12 @@ authorName: 'Serverless, Inc.'
 authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
 -->
 
-# Serverless Framework Node Express API on AWS
+# Meme Generator
 
-This template demonstrates how to develop and deploy a simple Node Express API service, backed by DynamoDB table, running on AWS Lambda using the Serverless Framework.
+Serverless API to generate memes.
 
-This template configures a single function, `api`, which is responsible for handling all incoming requests using the `httpApi` event. To learn more about `httpApi` event configuration options, please refer to [httpApi event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api/). As the event is configured in a way to accept all incoming requests, the Express.js framework is responsible for routing and handling requests internally. This implementation uses the `serverless-http` package to transform the incoming event request payloads to payloads compatible with Express.js. To learn more about `serverless-http`, please refer to the [serverless-http README](https://github.com/dougmoscrop/serverless-http).
 
-Additionally, it also handles provisioning of a DynamoDB database that is used for storing data about users. The Express.js application exposes two endpoints, `POST /users` and `GET /user/:userId`, which create and retrieve a user record.
-
-## Usage
-
-### Deployment
+## Start project locally
 
 Install dependencies with:
 
@@ -32,59 +27,88 @@ npm install
 and then deploy with:
 
 ```
-serverless deploy
+serverless offline start --reloadHandler
 ```
 
-After running deploy, you should see output similar to:
+## API Endpoints
 
-```
-Deploying "aws-node-express-dynamodb-api" to stage "dev" (us-east-1)
+The service exposes the following endpoints:
 
-✔ Service deployed to stack aws-node-express-dynamodb-api-dev (109s)
+### Upload Image Template
 
-endpoint: ANY - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com
-functions:
-  api: aws-node-express-dynamodb-api-dev-api (3.8 MB)
-```
+Upload an image to use as meme template.
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [`httpApi` event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api/). Additionally, in current configuration, the DynamoDB table will be removed when running `serverless remove`. To retain the DynamoDB table even after removal of the stack, add `DeletionPolicy: Retain` to its resource definition.
+- **URL**: `/upload`
+- **Method**: `POST`
+- **Content-Type**: `multipart/form-data`
+- **Request Body**:
+  - `file`: The image file to upload (required)
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "url": "string"
+  }
+  ```
 
-### Invocation
+### Generate Meme
 
-After successful deployment, you can create a new user by calling the corresponding endpoint:
+Generate a meme using a previously uploaded image template.
 
-```
-curl --request POST 'https://xxxxxx.execute-api.us-east-1.amazonaws.com/users' --header 'Content-Type: application/json' --data-raw '{"name": "John", "userId": "someUserId"}'
-```
+- **URL**: `/generate`
+- **Method**: `POST`
+- **Content-Type**: `application/json`
+- **Request Body**:
+  - `imageUrl`: The URL of the uploaded image template (required)
+  - `title`: The title of the meme (required)
+  - `topText`: The text to display at the top of the meme (optional, required if `bottomText` is not provided)
+  - `bottomText`: The text to display at the bottom of the meme (optional, required if `topText` is not provided)
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "url": "string"
+  }
+  ```
 
-Which should result in the following response:
+### List all Memes
 
-```json
-{ "userId": "someUserId", "name": "John" }
-```
+Get a list of all generated memes, sorted by creation date (newest first).
 
-You can later retrieve the user by `userId` by calling the following endpoint:
+- **URL**: `/memes`
+- **Method**: `GET`
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "memes": [
+      {
+        "id": "string",
+        "title": "string",
+        "imageUrl": "string",
+        "createdAt": "string"
+      }
+    ]
+  }
+  ```
 
-```
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/users/someUserId
-```
+### Get Meme by ID
 
-Which should result in the following response:
+Get details of a specific meme.
 
-```json
-{ "userId": "someUserId", "name": "John" }
-```
+- **URL**: `/memes/:id`
+- **Method**: `GET`
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "id": "string",
+    "title": "string",
+    "imageUrl": "string",
+    "createdAt": "string"
+  }
+  ```
 
-### Local development
+### Example
 
-The easiest way to develop and test your function is to use the `dev` command:
-
-```
-serverless dev
-```
-
-This will start a local emulator of AWS Lambda and tunnel your requests to and from AWS Lambda, allowing you to interact with your function as if it were running in the cloud.
-
-Now you can invoke the function as before, but this time the function will be executed locally. Now you can develop your function locally, invoke it, and see the results immediately without having to re-deploy.
-
-When you are done developing, don't forget to run `serverless deploy` to deploy the function to the cloud.
+![Example](./meme-example.png)
