@@ -15,7 +15,7 @@ script:pre-request {
   const path = require('path');
   const FormData = require("form-data");
   
-  const attachmentFilename = "wallpaper.png";
+  const attachmentFilename = "meme-template.png";
   const attachmentPath = path.join(bru.cwd(), attachmentFilename);
   const attachment = fs.readFileSync(attachmentPath, "base64");
   
@@ -25,4 +25,9 @@ script:pre-request {
   req.setHeader("Content-Encoding", "gzip");
   
   req.setBody(formData);
+}
+
+script:post-response {
+  const data = res.body;
+  bru.setEnvVar("fileUrl", data.url);
 }

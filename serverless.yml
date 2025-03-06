@@ -28,13 +28,7 @@ provider:
             - Fn::GetAtt: [MemesTable, Arn]
   environment:
     MEMES_TABLE: ${param:tableName}
-    AWS_ACCESS_KEY_ID: fake
-    AWS_SECRET_ACCESS_KEY: fake
-    MINIO_ENDPOINT: localhost
-    MINIO_PORT: 9000
-    MINIO_ACCESS_KEY: minioadmin
-    MINIO_SECRET_KEY: minioadmin
-    MINIO_BUCKET: memes-bucket
+    MEMES_BUCKET: memes-bucket
 
 functions:
   api:
@@ -60,10 +54,15 @@ resources:
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         TableName: ${param:tableName}
+    MemesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: memes-bucket
 
 plugins:
   - serverless-offline
   - serverless-dynamodb
+  - serverless-s3-local
 
 custom:
   serverless-dynamodb:
@@ -76,4 +75,7 @@ custom:
       migrate: true
       seed: true
       convertEmptyValues: true
-
+  s3:
+    host: localhost
+    port: 4569
+    directory: /tmp
