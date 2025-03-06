@@ -16,6 +16,9 @@ const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const generateMeme = require("./generate-meme");
 
+const MEMES_TABLE = process.env.MEMES_TABLE;
+const MEMES_BUCKET = process.env.MEMES_BUCKET;
+
 const app = express();
 
 const s3 = new S3Client({
@@ -23,12 +26,9 @@ const s3 = new S3Client({
   forcePathStyle: true,
 });
 
-// Setup multer to store files in memory instead of disk
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-const MEMES_TABLE = process.env.MEMES_TABLE;
-const MEMES_BUCKET = process.env.MEMES_BUCKET;
 const client = new DynamoDBClient({
   region: "localhost",
   endpoint: "http://localhost:8000",
@@ -164,22 +164,51 @@ app.post(
 
     return response.json({
       success: true,
-      url: `http://localhost:4569/memes-bucket/${memeKey}`,
+      url: `http://localhost:3000/meme/${memeId}`,
     });
   })
 );
 
 app.get(
   "/memes",
-  runAsyncWrapper(async (request, response) => {
-    // TODO: list memes
+  runAsyncWrapper(async (_request, response) => {
+    const { Items } = await docClient.send(
+      new ScanCommand({
+        TableName: MEMES_TABLE,
+      })
+    );
+
+    const sortedItems = Items
+      ? Items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      : [];
+
+    return response.json({
+      success: true,
+      memes: sortedItems,
+    });
   })
 );
 
 app.get(
   "/meme/:id",
   runAsyncWrapper(async (request, response) => {
-    // TODO: get meme by id
+    const id = request.params.id;
+
+    const { Item } = await docClient.send(
+      new GetCommand({
+        TableName: MEMES_TABLE,
+        Key: { id },
+      })
+    );
+
+    if (!Item) {
+      return response.status(404).json({ error: "Meme not found" });
+    }
+
+    return response.json({
+      success: true,
+      meme: Item,
+    });
   })
 );
 

@@ -13,7 +13,14 @@ post {
 body:json {
   {
     "imageUrl": "{{imageUrl}}",
+    "title": "test",
     "topText": "This is where I'd put\nmy working serverless\nproject",
     "bottomText": "If I had one"
   }
+}
+
+script:post-response {
+  const data = res.body;
+  const memeId = data.url.split("/").pop();
+  bru.setEnvVar("memeId", memeId);
 }
